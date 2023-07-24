@@ -2,6 +2,9 @@
 
 Проект создан для управления шаговым мотором с помощью NodeMCU(esp8266) и сервисом nightscout исходя из показаний датчика Freestyle libre (уровня сахара в крови). 
 
+## Демонстрация:
+https://youtu.be/vY7p96062Fs
+
 Схема подключения:
 ![image](https://github.com/VadimBunegin/librenightscout/assets/61832909/3cad3e4a-550d-4fe1-87a6-9dffb6b31b0f)
 
