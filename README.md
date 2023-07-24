@@ -52,3 +52,8 @@ https://cp.beget.com/login
 ## Xdrip
 https://github.com/NightscoutFoundation/xDrip
 Скачать: https://jamorham.github.io/#xdrip-plus
+
+## Доп материалы
+GPIO NodeMCU v1
+https://lastminuteengineers.b-cdn.net/wp-content/uploads/iot/ESP8266-Pinout-NodeMCU.png![image](https://github.com/VadimBunegin/librenightscout/assets/61832909/3b931f2a-5e96-4230-882a-812cd20eff53)
+
