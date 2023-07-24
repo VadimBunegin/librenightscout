@@ -15,9 +15,11 @@ String part01;
 #define IN4 12
 
 // Настройки шагового двигателя
-AccelStepper stepper(AccelStepper::FULL4WIRE, IN1, IN2, IN3, IN4);
+AccelStepper stepper(AccelStepper::FULL4WIRE, IN4, IN2, IN3, IN1);
 bool shouldRotate = false;
 bool tickerEnabled = false;
+bool flag = false;
+const int buttonPin = D8;
 
 void IRAM_ATTR onTimerISR() {
   shouldRotate = true;
@@ -55,7 +57,7 @@ void setup() {
   stepper.setAcceleration(1000.0); // Установка ускорения в шагах в секунду квадрат
 
   // Настройка аппаратного прерывания таймера
-  timerISR.attach(2.0, onTimerISR); // Прерывание каждые 2 секунды
+  timerISR.attach(5.0, onTimerISR); // Прерывание каждые 2 секунды
 }
 
 void loop() {
@@ -75,11 +77,22 @@ void loop() {
 
           // Проверяем условие и управляем флагом для вращения двигателя
           int value = part01.toInt();
-          if (value > 270) {
+          if (value > 150) {
             tickerEnabled = true; // Включаем таймерное прерывание
           } else {
             tickerEnabled = false; // Выключаем таймерное прерывание
+            if (digitalRead(buttonPin) == HIGH) { // Если кнопка нажата (при подтяжке к питанию)
+              flag = true; 
+              tickerEnabled = true;
+            } else {
+              flag = false;
+              // Выключаем таймерное прерывание, чтобы остановить вращение двигателя
+              tickerEnabled = false;
+            }
           }
+
+            // Управление двигателем с помощью кнопки
+          
         }
       } else {
         Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
@@ -92,12 +105,20 @@ void loop() {
 
   // Управление двигателем
   if (shouldRotate && tickerEnabled) {
-    // Если должны вращать и флаг включен, то сделаем один шаг
-    shouldRotate = false;
-    stepper.move(1000); // Вращаем на 90 градусов (зависит от конкретного двигателя и механики)
-    stepper.runToPosition();
+    if (flag){
+      // Если должны вращать и флаг включен, то сделаем один шаг
+      shouldRotate = false;
+      stepper.move(1000); // Вращаем на 90 градусов (зависит от конкретного двигателя и механики)
+      stepper.runToPosition();
+    }
+    else{
+      // Если должны вращать и флаг включен, то сделаем один шаг
+      shouldRotate = false;
+      stepper.move(-1000); // Вращаем на 90 градусов (зависит от конкретного двигателя и механики)
+      stepper.runToPosition();
+    }
+
+    
   }
 
-  // Возможно, вам понадобится небольшая задержка, чтобы дать время другим задачам обрабатываться
-  delay(5000);
 }
