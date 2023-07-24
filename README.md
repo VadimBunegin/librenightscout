@@ -48,3 +48,7 @@ https://nightscout.github.io/vendors/VPS/docker/
 
 ## Ссылка на сервер:
 https://cp.beget.com/login
+
+## Xdrip
+https://github.com/NightscoutFoundation/xDrip
+Скачать: https://jamorham.github.io/#xdrip-plus
