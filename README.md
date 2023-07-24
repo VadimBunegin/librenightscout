@@ -55,7 +55,7 @@ https://github.com/NightscoutFoundation/xDrip
 
 ## Доп материалы
 GPIO NodeMCU v1
-https://lastminuteengineers.b-cdn.net/wp-content/uploads/iot/ESP8266-Pinout-NodeMCU.png![image](https://github.com/VadimBunegin/librenightscout/assets/61832909/b493333a-8dda-40a7-8b5d-33a316981834)
+https://lastminuteengineers.b-cdn.net/wp-content/uploads/iot/ESP8266-Pinout-NodeMCU.png
 
 
 
