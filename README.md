@@ -1,4 +1,4 @@
-# librenightscout
+![image](https://github.com/VadimBunegin/librenightscout/assets/61832909/1f027e8e-6bdb-477a-bc60-e45649b66c6e)# librenightscout
 Проект создан для управления шаговым мотором с помощью NodeMCU(esp8266) и сервисом nightscout исходя из показаний датчика Freestyle libre (уровня сахара в крови). 
 
 
@@ -55,7 +55,9 @@ https://github.com/NightscoutFoundation/xDrip
 
 ## Доп материалы
 GPIO NodeMCU v1
-https://lastminuteengineers.b-cdn.net/wp-content/uploads/iot/ESP8266-Pinout-NodeMCU.png![image](https://github.com/VadimBunegin/librenightscout/assets/61832909/33780780-cd73-432b-bf19-a1f960326419)
+https://lastminuteengineers.b-cdn.net/wp-content/uploads/iot/ESP8266-Pinout-NodeMCU.png![image](https://github.com/VadimBunegin/librenightscout/assets/61832909/b493333a-8dda-40a7-8b5d-33a316981834)
+
+
 
 
 
