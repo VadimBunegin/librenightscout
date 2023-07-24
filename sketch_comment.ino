@@ -10,7 +10,7 @@ const char* ssid = "Beeline_5E79";
 const char* password = "92515952";
 String part01;
 
-// Пины для управления шаговым двигателем
+// Пины для управления шаговым двигателем в GPIO
 #define IN1 5
 #define IN2 4
 #define IN3 14
@@ -23,7 +23,7 @@ AccelStepper stepper(AccelStepper::FULL4WIRE, IN4, IN2, IN3, IN1);
 bool shouldRotate = false;
 bool tickerEnabled = false;
 bool flag = false;
-const int buttonPin = D8;
+const int buttonPin = D8; // пин кнопки
 
 // Прерывание таймера
 void IRAM_ATTR onTimerISR() {
