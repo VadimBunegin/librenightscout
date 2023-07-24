@@ -5,12 +5,12 @@
 ## Демонстрация:
 https://youtu.be/vY7p96062Fs
 
-Схема подключения:
+## Схема подключения:
 ![image](https://github.com/VadimBunegin/librenightscout/assets/61832909/3cad3e4a-550d-4fe1-87a6-9dffb6b31b0f)
 
 
-Разворачивание nightscout: 
+## Разворачивание nightscout: 
 https://nightscout.github.io/vendors/VPS/docker/
 
-Ссылка на сервер:
+## Ссылка на сервер:
 https://cp.beget.com/login
