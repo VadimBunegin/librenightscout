@@ -6,15 +6,18 @@
 #include <WiFiClientSecureBearSSL.h>
 #include <AccelStepper.h>
 #include <Ticker.h>
+#include <LiquidCrystal_I2C.h>
 
 const int tachPIN = D4;
-const unsigned long sampleTime = 1000;
+const unsigned long sampleTime = 10;
+
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
 
 int totalimps = 0;
 int value = 0;
 #define ON_Board_LED 2
-const char* ssid = "AndroidAP";
-const char* password = "srri1391";
+const char* ssid = "Redmi Note 10v";
+const char* password = "vadik1234";
 
 const char* host = "script.google.com";
 const int httpsPort = 443;
@@ -23,8 +26,8 @@ WiFiClientSecure client;
 
 String GAS_ID = "AKfycbyT1XyQYQawxhznzRkS0ZtZka2jwsYS7GRKZjv_MxrQ_fUf1SuF"; 
 
-#define IN1 5
-#define IN2 4
+#define IN1 0
+#define IN2 2
 #define IN3 14
 #define IN4 12
 const int buttonPin = D8; // Pin to which the button is connected
@@ -71,11 +74,15 @@ void setup() {
   client.setInsecure();
 
   // AccelStepper setup
-  stepper.setMaxSpeed(1000.0); // Set maximum speed in steps per second
-  stepper.setAcceleration(1000.0); // Set acceleration in steps per second squared
+  stepper.setMaxSpeed(500.0); // Set maximum speed in steps per second
+  stepper.setAcceleration(500.0); // Set acceleration in steps per second squared
 
   // Timer ISR setup
   timerISR.attach(2.0, onTimerISR); // Trigger ISR every 2 seconds
+  lcd.init();
+  // turn on LCD backlight 
+  lcd.backlight();
+  lcd.print("");
 }
 
 void loop() {
@@ -106,6 +113,11 @@ void loop() {
             tickerEnabled = false;
             Serial.println("Stop");
           }
+            lcd.setCursor(0, 0);
+
+            lcd.print(value);
+
+
         }
       } else {
         Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
@@ -137,6 +149,9 @@ void sendData(int hum) {
     return;
   }
   
+
+
+
   String string_humidity = String(hum, DEC);
   String url = "https://script.google.com/macros/s/" + GAS_ID + "/exec?&humidity=" + string_humidity;
   Serial.print("requesting URL: ");
