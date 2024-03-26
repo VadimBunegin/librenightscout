@@ -1,0 +1,186 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <GyverOLED.h>
+#include <AccelStepper.h>
+#include <Arduino.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <WiFiClientSecureBearSSL.h>
+#include <AccelStepper.h>
+#include <Ticker.h>
+
+GyverOLED<SSD1306_128x64, OLED_NO_BUFFER> oled;
+
+const char *ssid = "Redmi Note 10v";
+const char *password = "vadik1234";
+String part01;
+ESP8266WebServer server(80); // Объект веб-сервера, слушающий порт 80
+
+float param1 = 0;
+float param2 = 0;
+float param3 = 0;
+float param4 = 0;
+float param5 = 0;
+float param6 = 0;
+
+#define IN1 14
+#define IN2 12
+#define IN3 13
+#define IN4 15
+
+AccelStepper stepper(AccelStepper::FULL4WIRE, IN4, IN2, IN3, IN1);
+
+String getValue(String data, char separator, int index) {
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int maxIndex = data.length()-1;
+
+  for(int i=0; i<=maxIndex && found<=index; i++){
+    if(data.charAt(i)==separator || i==maxIndex){
+        found++;
+        strIndex[0] = strIndex[1]+1;
+        strIndex[1] = (i == maxIndex) ? i+1 : i;
+    }
+  }
+  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  // Подключение к Wi-Fi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(250);
+    Serial.print(".");
+  }
+  Serial.println("");
+
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+  
+  // Обработка запросов по корневому пути
+  server.on("/", HTTP_GET, []() {
+    String html = "<html><head><style>";
+    html += "body {font-family: Arial, sans-serif; background-color: #3498db; color: #ffffff; text-align: center;}";
+    html += "form {margin: 20px; padding: 20px; display: inline-block; text-align: left; background-color: #34495e; border-radius: 10px;}";
+    html += "label {display: block; margin-bottom: 5px;}";
+    html += "input {margin-bottom: 10px; padding: 8px;}";
+    html += "h1 {font-size: 36px; font-weight: bold;}";
+    html += "h2 {font-size: 24px; font-weight: bold;}";
+    html += "img {max-width: 100%; height: auto;}";
+    html += "</style></head><body>";
+    html += "<div style='margin: 50px auto;'>";
+    html += "<h1>Your Health App</h1>";
+    html += "<h2>Parameter Settings</h2>";
+    html += "<form action='/update' method='POST'>";
+    html += "<label for='param1'>Blood Glucose:</label>";
+    html += "<input type='text' id='param1' name='param1'><br>";
+    html += "<label for='param2'>Bread Unit:</label>";
+    html += "<input type='text' id='param2' name='param2'><br>";
+    html += "<label for='param3'>Carbohydrate Ratio:</label>";
+    html += "<input type='text' id='param3' name='param3'><br>";
+    html += "<label for='param4'>Insulin Sensitivity Factor:</label>";
+    html += "<input type='text' id='param4' name='param4'><br>";
+    html += "<label for='param5'>Active Insulin:</label>";
+    html += "<input type='text' id='param5' name='param5'><br>";
+    html += "<label for='param6'>Target glycemia:</label>";
+    html += "<input type='text' id='param6' name='param6'><br>";
+    html += "<input type='submit' value='Update' style='background-color: #2ecc71; color: #ffffff; border: none; padding: 10px; border-radius: 5px; cursor: pointer;'>";
+    html += "</form></div></body></html>";
+    server.send(200, "text/html", html);
+  });
+
+  // Обработка POST-запроса для обновления параметров
+  server.on("/update", HTTP_POST, []() {
+    param1 = server.arg("param1").toFloat();
+    param2 = server.arg("param2").toFloat();
+    param3 = server.arg("param3").toFloat();
+    param4 = server.arg("param4").toFloat();
+    param5 = server.arg("param5").toFloat();
+    param5 = server.arg("param6").toFloat();
+    server.send(200, "text/plain", "Parameters updated");
+  });
+
+  server.begin();
+    stepper.setMaxSpeed(400.0); 
+  stepper.setAcceleration(400.0); 
+}
+
+void loop() {
+  server.handleClient();
+
+  oled.init();        // инициализация
+  oled.clear();       // очистка
+  oled.setScale(2);   // масштаб текста (1..4)
+  oled.home(); 
+
+
+  oled.print(param1);
+    oled.setScale(1);
+  oled.print(" mmol/l ");
+  oled.setCursor(0, 2);
+  oled.print("BU: ");
+  oled.print(param2);
+  oled.setCursor(0, 3);
+  oled.print("CR: ");
+  oled.print(param3);
+  oled.setCursor(0, 4);
+  oled.print("ISF: ");
+  oled.print(param4);
+  oled.setCursor(0, 5);
+  oled.print("AI: ");
+  oled.print(param5);
+  oled.setCursor(0, 6);
+  oled.print("TG: ");
+  oled.print(param6);
+  oled.setCursor(0, 7);
+  oled.print("Set - 192.168.0.15");
+  delay(3000);
+
+
+  if ((WiFi.status() == WL_CONNECTED)) {
+    std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
+    client->setInsecure();
+
+    HTTPClient https;
+    if (https.begin(*client, "https://librenightscout.ru/api/v1/entries/sgv?count=1")) {
+      int httpCode = https.GET();
+      if (httpCode > 0) {
+        Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
+        if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
+          String payload = https.getString();
+          part01 = getValue(payload, '\t', 2);
+          Serial.println(part01);
+
+          int value = part01.toInt();
+
+
+        }
+      } else {
+        Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
+      }
+      https.end();
+    } else {
+      Serial.printf("[HTTPS] Unable to connect\n");
+    }
+  }
+  
+
+  if (param1 > 14.0 && param5 == 0){
+      digitalWrite(D0, HIGH);
+      delay(200);
+      digitalWrite(D0, LOW);
+      stepper.move(4000);
+      stepper.runToPosition();
+  }
+    if (param1 > 14.0 && param5 == 1){
+      digitalWrite(D0, HIGH);
+      delay(200);
+      digitalWrite(D0, LOW);
+      stepper.move(-4000);
+      stepper.runToPosition();
+  }
+
+}
