@@ -46,6 +46,7 @@ String getValue(String data, char separator, int index) {
 }
 
 void setup() {
+  pinMode(D0, OUTPUT);
   Serial.begin(115200);
 
   // Подключение к Wi-Fi
@@ -99,7 +100,7 @@ void setup() {
     param3 = server.arg("param3").toFloat();
     param4 = server.arg("param4").toFloat();
     param5 = server.arg("param5").toFloat();
-    param5 = server.arg("param6").toFloat();
+    param6 = server.arg("param6").toFloat();
     server.send(200, "text/plain", "Parameters updated");
   });
 
@@ -172,12 +173,29 @@ void loop() {
       digitalWrite(D0, HIGH);
       delay(200);
       digitalWrite(D0, LOW);
+      delay(200);
+      digitalWrite(D0, HIGH);
+      delay(200);
+      digitalWrite(D0, LOW);
+            delay(200);
+      digitalWrite(D0, HIGH);
+      delay(200);
+      digitalWrite(D0, LOW);
       stepper.move(4000);
       stepper.runToPosition();
   }
     if (param1 > 14.0 && param5 == 1){
       digitalWrite(D0, HIGH);
       delay(200);
+      digitalWrite(D0, LOW);
+      delay(200);
+      digitalWrite(D0, HIGH);
+      delay(200);
+      digitalWrite(D0, LOW);
+            delay(200);
+      digitalWrite(D0, HIGH);
+      delay(200);
+      digitalWrite(D0, LOW);
       digitalWrite(D0, LOW);
       stepper.move(-4000);
       stepper.runToPosition();
