@@ -14,7 +14,11 @@ GyverOLED<SSD1306_128x64, OLED_NO_BUFFER> oled;
 const char *ssid = "Redmi Note 10v";
 const char *password = "vadik1234";
 String part01;
+String part02;
+String flag;
+
 ESP8266WebServer server(80); // Объект веб-сервера, слушающий порт 80
+
 
 float param1 = 0;
 float param2 = 0;
@@ -110,7 +114,8 @@ void setup() {
 }
 
 void loop() {
-  server.handleClient();
+  
+    server.handleClient();
 
   oled.init();        // инициализация
   oled.clear();       // очистка
@@ -139,24 +144,68 @@ void loop() {
   oled.setCursor(0, 7);
   oled.print("Set - 192.168.0.15");
   delay(3000);
-
-
   if ((WiFi.status() == WL_CONNECTED)) {
     std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
     client->setInsecure();
 
     HTTPClient https;
-    if (https.begin(*client, "https://librenightscout.ru/api/v1/entries/sgv?count=1")) {
+    if (https.begin(*client, "https://insulinpump.store/api/v1/entries/sgv?count=1")) {
       int httpCode = https.GET();
       if (httpCode > 0) {
         Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
         if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
           String payload = https.getString();
           part01 = getValue(payload, '\t', 2);
-          Serial.println(part01);
+          part02 = getValue(payload, '\t', 0);
+          
 
-          int value = part01.toInt();
 
+
+          
+
+          param1 = part01.toInt();
+          Serial.println(flag);
+          Serial.println(part02);
+        if (flag != part02 || param5 == 1){
+
+          
+        if (param1 > 14.0 && param6 == 1){
+              digitalWrite(D0, HIGH);
+              delay(200);
+              digitalWrite(D0, LOW);
+              delay(200);
+              digitalWrite(D0, HIGH);
+              delay(200);
+              digitalWrite(D0, LOW);
+                    delay(200);
+              digitalWrite(D0, HIGH);
+              delay(200);
+              digitalWrite(D0, LOW);
+              stepper.move(3000);
+              stepper.runToPosition();
+              flag = part02;
+              param5 = 0;
+              
+          }
+            if (param1 > 14.0 && param6 == 0){
+              digitalWrite(D0, HIGH);
+              delay(200);
+              digitalWrite(D0, LOW);
+              delay(200);
+              digitalWrite(D0, HIGH);
+              delay(200);
+              digitalWrite(D0, LOW);
+                    delay(200);
+              digitalWrite(D0, HIGH);
+              delay(200);
+              digitalWrite(D0, LOW);
+              digitalWrite(D0, LOW);
+              stepper.move(-3000);
+              stepper.runToPosition();
+              flag = part02;
+              param5 = 0;
+          }
+        }
 
         }
       } else {
@@ -167,38 +216,10 @@ void loop() {
       Serial.printf("[HTTPS] Unable to connect\n");
     }
   }
-  
 
-  if (param1 > 14.0 && param5 == 0){
-      digitalWrite(D0, HIGH);
-      delay(200);
-      digitalWrite(D0, LOW);
-      delay(200);
-      digitalWrite(D0, HIGH);
-      delay(200);
-      digitalWrite(D0, LOW);
-            delay(200);
-      digitalWrite(D0, HIGH);
-      delay(200);
-      digitalWrite(D0, LOW);
-      stepper.move(4000);
-      stepper.runToPosition();
-  }
-    if (param1 > 14.0 && param5 == 1){
-      digitalWrite(D0, HIGH);
-      delay(200);
-      digitalWrite(D0, LOW);
-      delay(200);
-      digitalWrite(D0, HIGH);
-      delay(200);
-      digitalWrite(D0, LOW);
-            delay(200);
-      digitalWrite(D0, HIGH);
-      delay(200);
-      digitalWrite(D0, LOW);
-      digitalWrite(D0, LOW);
-      stepper.move(-4000);
-      stepper.runToPosition();
-  }
+
+
+
+  
 
 }
